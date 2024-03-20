@@ -1,7 +1,7 @@
 'use client';
 
 import { fromBlob } from 'geotiff';
-import { LngLatBoundsLike, Map, SourceSpecification } from 'maplibre-gl';
+import { LngLatBoundsLike, Map } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useState } from 'react';
 import { generateCogSource } from './module/cog';
@@ -28,7 +28,7 @@ export default function Home() {
       map.addLayer({
         source: 'image',
         id: 'image',
-        type: 'raster'
+        type: 'raster',
       });
 
       map.fitBounds(bounds as LngLatBoundsLike);

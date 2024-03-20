@@ -1,5 +1,5 @@
 import { encode } from 'fast-png';
-import GeoTIFF, { Pool, fromArrayBuffer, fromUrl } from 'geotiff';
+import { Pool, fromBlob } from 'geotiff';
 import maplibregl, { RasterSourceSpecification } from 'maplibre-gl';
 
 /**
@@ -23,17 +23,10 @@ const merc = (x: number, y: number, z: number): number[] => {
 };
 
 export const generateCogSource = async (
-  input: string | Blob | ArrayBuffer,
+  input: Blob,
 ): Promise<{ source: RasterSourceSpecification }> => {
-	let parser = {
-		string: fromUrl,
-		arrayBuffer: fromArrayBuffer,
-
-
-		
-	};
-
-  const tiff = await fromUrl(input);
+  const url = URL.createObjectURL(input);
+  const tiff = await fromBlob(input);
   const pool = new Pool();
 
   maplibregl.addProtocol('cog', async (params) => {
