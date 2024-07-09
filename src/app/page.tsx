@@ -1,10 +1,8 @@
 'use client';
 
-import { fromBlob } from 'geotiff';
-import { LngLatBoundsLike, Map } from 'maplibre-gl';
+import { Map } from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { useEffect, useState } from 'react';
-import { generateCogSource } from './module/cog';
 
 export default function Home() {
   const mapDiv = 'map';
@@ -13,35 +11,37 @@ export default function Home() {
   const style = `https://tiles.stadiamaps.com/styles/alidade_smooth_dark.json?api_key=${keyStadia}`;
 
   const [map, setMap] = useState<Map>();
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    window.ondragover = (e: DragEvent) => e.preventDefault();
-    window.ondrop = async (e: DragEvent) => {
-      e.preventDefault();
-      const file = e.dataTransfer.files[0];
-      const data = await fromBlob(file);
-      const image = await data.getImage();
-      const bounds = image.getBoundingBox();
-
-      const { source } = await generateCogSource(file);
-      map.addSource('image', source);
-      map.addLayer({
-        source: 'image',
-        id: 'image',
-        type: 'raster',
-      });
-
-      map.fitBounds(bounds as LngLatBoundsLike);
-    };
-
     const map = new Map({
       container: mapDiv,
-      center: [119, 0],
-      zoom: 4,
+      center: [116.832, -1.255],
+      zoom: 10,
       style: style,
     });
     setMap(map);
+
+    map.on('load', () => setLoaded(true));
   }, []);
+
+  useEffect(() => {
+    if (map && loaded) {
+      map.addSource('raster', {
+        type: 'raster',
+        tiles: ['/raster/data/{z}/{x}/{y}.jpg'],
+        tileSize: 512,
+      });
+
+      map.addLayer({
+        id: 'raster',
+        source: 'raster',
+        type: 'raster',
+        minzoom: 0,
+        maxzoom: 20,
+      });
+    }
+  }, [map, loaded]);
 
   return <div id={mapDiv}></div>;
 }
