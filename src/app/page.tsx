@@ -16,7 +16,7 @@ export default function Home() {
   useEffect(() => {
     const map = new Map({
       container: mapDiv,
-      center: [116.832, -1.255],
+      center: [116.833, -1.262],
       zoom: 10,
       style: style,
     });
@@ -29,16 +29,14 @@ export default function Home() {
     if (map && loaded) {
       map.addSource('raster', {
         type: 'raster',
-        tiles: ['/raster/data/{z}/{x}/{y}.jpg'],
-        tileSize: 512,
+        tiles: ['/raster/data/{z}/{x}/{y}'],
+        tileSize: 256,
       });
 
       map.addLayer({
         id: 'raster',
         source: 'raster',
         type: 'raster',
-        minzoom: 0,
-        maxzoom: 20,
       });
     }
   }, [map, loaded]);
