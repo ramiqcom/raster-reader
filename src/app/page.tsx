@@ -18,25 +18,6 @@ export default function Home() {
     'https://storage.googleapis.com/gee-ramiqcom-bucket/cog/landsat_sembilang_2023_567.tif',
   );
 
-  async function loadRaster() {
-    const bounds = (await (await fromUrl(url)).getImage()).getBoundingBox();
-    const boundsGeo = bboxMeters2Degrees(bounds) as [number, number, number, number];
-    map.fitBounds(boundsGeo);
-
-    map.addSource('raster', {
-      type: 'raster',
-      tiles: [`cog/${url}/{z}/{x}/{y}`],
-      tileSize: 256,
-      bounds: boundsGeo,
-    });
-
-    map.addLayer({
-      id: 'raster',
-      source: 'raster',
-      type: 'raster',
-    });
-  }
-
   useEffect(() => {
     const map = new Map({
       container: mapDiv,
@@ -51,9 +32,28 @@ export default function Home() {
 
   useEffect(() => {
     if (map && loaded && url) {
-      loadRaster();
+      loadRaster(map, url);
     }
   }, [map, loaded, url]);
 
   return <div id={mapDiv}></div>;
+}
+
+async function loadRaster(map: Map, url: string) {
+  const bounds = (await (await fromUrl(url)).getImage()).getBoundingBox();
+  const boundsGeo = bboxMeters2Degrees(bounds) as [number, number, number, number];
+  map.fitBounds(boundsGeo);
+
+  map.addSource('raster', {
+    type: 'raster',
+    tiles: [`cog/${url}/{z}/{x}/{y}`],
+    tileSize: 256,
+    bounds: boundsGeo,
+  });
+
+  map.addLayer({
+    id: 'raster',
+    source: 'raster',
+    type: 'raster',
+  });
 }
